@@ -1,7 +1,10 @@
-import Box from '@mui/material/Box';
+import { mergeClasses } from 'minimal-shared/utils';
+
+import { styled } from '@mui/material/styles';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
-import { layoutClasses } from '../classes';
+import { layoutClasses } from './classes';
+import { layoutSectionVars } from './css-vars';
 
 // ----------------------------------------------------------------------
 
@@ -12,32 +15,50 @@ export function LayoutSection({
   footerSection,
   headerSection,
   sidebarSection,
+  className,
+  ...other
 }) {
   const inputGlobalStyles = (
-    <GlobalStyles
-      styles={{
-        body: {
-          '--layout-nav-zIndex': 1101,
-          '--layout-nav-mobile-width': '320px',
-          '--layout-header-blur': '8px',
-          '--layout-header-zIndex': 1100,
-          '--layout-header-mobile-height': '64px',
-          '--layout-header-desktop-height': '72px',
-          ...cssVars,
-        },
-      }}
-    />
+    <GlobalStyles styles={(theme) => ({ body: { ...layoutSectionVars(theme), ...cssVars } })} />
   );
 
   return (
     <>
       {inputGlobalStyles}
 
-      <Box id="root__layout" className={layoutClasses.root} sx={sx}>
-        {headerSection}
-        {children}
-        {footerSection}
-      </Box>
+      <LayoutRoot
+        id="root__layout"
+        className={mergeClasses([layoutClasses.root, className])}
+        sx={sx}
+        {...other}
+      >
+        {sidebarSection ? (
+          <>
+            {sidebarSection}
+            <LayoutSidebarContainer className={layoutClasses.sidebarContainer}>
+              {headerSection}
+              {children}
+              {footerSection}
+            </LayoutSidebarContainer>
+          </>
+        ) : (
+          <>
+            {headerSection}
+            {children}
+            {footerSection}
+          </>
+        )}
+      </LayoutRoot>
     </>
   );
 }
+
+// ----------------------------------------------------------------------
+
+const LayoutRoot = styled('div')``;
+
+const LayoutSidebarContainer = styled('div')(() => ({
+  display: 'flex',
+  flex: '1 1 auto',
+  flexDirection: 'column',
+}));

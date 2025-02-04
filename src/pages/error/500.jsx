@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 
-import { CONFIG } from 'src/config-global';
+import { CONFIG } from 'src/global-config';
 
-import { Error500View } from 'src/sections/error/500-view';
+import { View500 } from 'src/sections/error';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ export default function Page() {
         <title> {metadata.title}</title>
       </Helmet>
 
-      <Error500View />
+      <View500 />
     </>
   );
 }

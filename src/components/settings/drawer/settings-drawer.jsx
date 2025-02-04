@@ -1,55 +1,75 @@
+import { useEffect, useCallback } from 'react';
+import { hasKeys, varAlpha } from 'minimal-shared/utils';
+
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Badge from '@mui/material/Badge';
+import Drawer from '@mui/material/Drawer';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Drawer, { drawerClasses } from '@mui/material/Drawer';
-import { useTheme, useColorScheme } from '@mui/material/styles';
+import { useColorScheme } from '@mui/material/styles';
 
-import COLORS from 'src/theme/core/colors.json';
-import { paper, varAlpha } from 'src/theme/styles';
-import { defaultFont } from 'src/theme/core/typography';
-import PRIMARY_COLOR from 'src/theme/with-settings/primary-color.json';
-import SECONDARY_COLOR from 'src/theme/with-settings/secondary-color.json';
+import { themeConfig } from 'src/theme/theme-config';
+import { primaryColorPresets } from 'src/theme/with-settings';
 
 import { Iconify } from '../../iconify';
 import { BaseOption } from './base-option';
 import { Scrollbar } from '../../scrollbar';
-import { FontOptions } from './font-options';
-import { useSettingsContext } from '../context';
+import { SmallBlock, LargeBlock } from './styles';
 import { PresetsOptions } from './presets-options';
-import { defaultSettings } from '../config-settings';
 import { FullScreenButton } from './fullscreen-button';
+import { FontSizeOptions, FontFamilyOptions } from './font-options';
+import { useSettingsContext } from '../context/use-settings-context';
+import { NavColorOptions, NavLayoutOptions } from './nav-layout-option';
 
 // ----------------------------------------------------------------------
 
-const PRESET_NAMES = ['default', 'preset1', 'preset2', 'preset3', 'preset4', 'preset5'];
-
-// ----------------------------------------------------------------------
-
-export function SettingsDrawer({ sx, hideFont, hidePresets, hideDirection, hideColorScheme }) {
-  const theme = useTheme();
-
+export function SettingsDrawer({ sx, defaultSettings }) {
   const settings = useSettingsContext();
 
-  const { mode, setMode } = useColorScheme();
+  const { mode, setMode, systemMode } = useColorScheme();
 
-  const renderHead = (
-    <Box display="flex" alignItems="center" sx={{ py: 2, pr: 1, pl: 2.5 }}>
+  useEffect(() => {
+    if (mode === 'system' && systemMode) {
+      settings.setState({ colorScheme: systemMode });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, systemMode]);
+
+  // Visible options by default settings
+  const isFontFamilyVisible = hasKeys(defaultSettings, ['fontFamily']);
+  const isCompactLayoutVisible = hasKeys(defaultSettings, ['compactLayout']);
+  const isDirectionVisible = hasKeys(defaultSettings, ['direction']);
+  const isColorSchemeVisible = hasKeys(defaultSettings, ['colorScheme']);
+  const isContrastVisible = hasKeys(defaultSettings, ['contrast']);
+  const isNavColorVisible = hasKeys(defaultSettings, ['navColor']);
+  const isNavLayoutVisible = hasKeys(defaultSettings, ['navLayout']);
+  const isPrimaryColorVisible = hasKeys(defaultSettings, ['primaryColor']);
+  const isFontSizeVisible = hasKeys(defaultSettings, ['fontSize']);
+
+  const handleReset = useCallback(() => {
+    settings.onReset();
+    setMode(defaultSettings.colorScheme);
+  }, [defaultSettings.colorScheme, setMode, settings]);
+
+  const renderHead = () => (
+    <Box
+      sx={{
+        py: 2,
+        pr: 1,
+        pl: 2.5,
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
       <Typography variant="h6" sx={{ flexGrow: 1 }}>
         Settings
       </Typography>
 
       <FullScreenButton />
 
-      <Tooltip title="Reset">
-        <IconButton
-          onClick={() => {
-            settings.onReset();
-            setMode(defaultSettings.colorScheme);
-          }}
-        >
+      <Tooltip title="Reset all">
+        <IconButton onClick={handleReset}>
           <Badge color="error" variant="dot" invisible={!settings.canReset}>
             <Iconify icon="solar:restart-bold" />
           </Badge>
@@ -58,59 +78,143 @@ export function SettingsDrawer({ sx, hideFont, hidePresets, hideDirection, hideC
 
       <Tooltip title="Close">
         <IconButton onClick={settings.onCloseDrawer}>
-          <Iconify icon="eva:close-outline" />
+          <Iconify icon="mingcute:close-line" />
         </IconButton>
       </Tooltip>
     </Box>
   );
 
-  const renderMode = (
+  const renderMode = () => (
     <BaseOption
       label="Dark mode"
       icon="moon"
-      selected={settings.colorScheme === 'dark'}
-      onClick={() => {
-        settings.onUpdateField('colorScheme', mode === 'light' ? 'dark' : 'light');
+      selected={settings.state.colorScheme === 'dark'}
+      onChangeOption={() => {
         setMode(mode === 'light' ? 'dark' : 'light');
+        settings.setState({ colorScheme: mode === 'light' ? 'dark' : 'light' });
       }}
     />
   );
 
-  const renderRTL = (
+  const renderContrast = () => (
     <BaseOption
-      label="Right to left"
-      icon="align-right"
-      selected={settings.direction === 'rtl'}
-      onClick={() =>
-        settings.onUpdateField('direction', settings.direction === 'ltr' ? 'rtl' : 'ltr')
+      label="Contrast"
+      icon="contrast"
+      selected={settings.state.contrast === 'hight'}
+      onChangeOption={() =>
+        settings.setState({
+          contrast: settings.state.contrast === 'default' ? 'hight' : 'default',
+        })
       }
     />
   );
 
-  const renderPresets = (
-    <PresetsOptions
-      value={settings.primaryColor}
-      onClickOption={(newValue) => settings.onUpdateField('primaryColor', newValue)}
-      options={PRESET_NAMES.map((option) =>
-        option === 'default'
-          ? {
-              name: 'default',
-              value: [COLORS.primary.main, COLORS.secondary.main],
-            }
-          : {
-              name: option,
-              value: [PRIMARY_COLOR[option].main, SECONDARY_COLOR[option].main],
-            }
-      )}
+  const renderRtl = () => (
+    <BaseOption
+      label="Right to left"
+      icon="align-right"
+      selected={settings.state.direction === 'rtl'}
+      onChangeOption={() =>
+        settings.setState({
+          direction: settings.state.direction === 'ltr' ? 'rtl' : 'ltr',
+        })
+      }
     />
   );
 
-  const renderFont = (
-    <FontOptions
-      value={settings.fontFamily}
-      onClickOption={(newValue) => settings.onUpdateField('fontFamily', newValue)}
-      options={[defaultFont, 'Inter Variable', 'DM Sans Variable', 'Nunito Sans Variable']}
+  const renderCompact = () => (
+    <BaseOption
+      tooltip="Dashboard only and available at large resolutions > 1600px (xl)"
+      label="Compact"
+      icon="autofit-width"
+      selected={!!settings.state.compactLayout}
+      onChangeOption={() => settings.setState({ compactLayout: !settings.state.compactLayout })}
     />
+  );
+
+  const renderPresets = () => (
+    <LargeBlock
+      title="Presets"
+      canReset={settings.state.primaryColor !== defaultSettings.primaryColor}
+      onReset={() => settings.setState({ primaryColor: defaultSettings.primaryColor })}
+    >
+      <PresetsOptions
+        options={Object.keys(primaryColorPresets).map((key) => ({
+          name: key,
+          value: primaryColorPresets[key].main,
+        }))}
+        value={settings.state.primaryColor}
+        onChangeOption={(newOption) => settings.setState({ primaryColor: newOption })}
+      />
+    </LargeBlock>
+  );
+
+  const renderNav = () => (
+    <LargeBlock title="Nav" tooltip="Dashboard only" sx={{ gap: 2.5 }}>
+      {isNavLayoutVisible && (
+        <SmallBlock
+          label="Layout"
+          canReset={settings.state.navLayout !== defaultSettings.navLayout}
+          onReset={() => settings.setState({ navLayout: defaultSettings.navLayout })}
+        >
+          <NavLayoutOptions
+            options={['vertical', 'horizontal', 'mini']}
+            value={settings.state.navLayout}
+            onChangeOption={(newOption) => settings.setState({ navLayout: newOption })}
+          />
+        </SmallBlock>
+      )}
+      {isNavColorVisible && (
+        <SmallBlock
+          label="Color"
+          canReset={settings.state.navColor !== defaultSettings.navColor}
+          onReset={() => settings.setState({ navColor: defaultSettings.navColor })}
+        >
+          <NavColorOptions
+            options={['integrate', 'apparent']}
+            value={settings.state.navColor}
+            onChangeOption={(newOption) => settings.setState({ navColor: newOption })}
+          />
+        </SmallBlock>
+      )}
+    </LargeBlock>
+  );
+
+  const renderFont = () => (
+    <LargeBlock title="Font" sx={{ gap: 2.5 }}>
+      {isFontFamilyVisible && (
+        <SmallBlock
+          label="Family"
+          canReset={settings.state.fontFamily !== defaultSettings.fontFamily}
+          onReset={() => settings.setState({ fontFamily: defaultSettings.fontFamily })}
+        >
+          <FontFamilyOptions
+            options={[
+              themeConfig.fontFamily.primary,
+              'Inter Variable',
+              'DM Sans Variable',
+              'Nunito Sans Variable',
+            ]}
+            value={settings.state.fontFamily}
+            onChangeOption={(newOption) => settings.setState({ fontFamily: newOption })}
+          />
+        </SmallBlock>
+      )}
+      {isFontSizeVisible && (
+        <SmallBlock
+          label="Size"
+          canReset={settings.state.fontSize !== defaultSettings.fontSize}
+          onReset={() => settings.setState({ fontSize: defaultSettings.fontSize })}
+          sx={{ gap: 5 }}
+        >
+          <FontSizeOptions
+            options={[12, 20]}
+            value={settings.state.fontSize}
+            onChangeOption={(newOption) => settings.setState({ fontSize: newOption })}
+          />
+        </SmallBlock>
+      )}
+    </LargeBlock>
   );
 
   return (
@@ -119,29 +223,47 @@ export function SettingsDrawer({ sx, hideFont, hidePresets, hideDirection, hideC
       open={settings.openDrawer}
       onClose={settings.onCloseDrawer}
       slotProps={{ backdrop: { invisible: true } }}
-      sx={{
-        [`& .${drawerClasses.paper}`]: {
-          ...paper({
-            theme,
-            color: varAlpha(theme.vars.palette.background.defaultChannel, 0.9),
+      PaperProps={{
+        sx: [
+          (theme) => ({
+            ...theme.mixins.paperStyles(theme, {
+              color: varAlpha(theme.vars.palette.background.defaultChannel, 0.9),
+            }),
+            width: 360,
           }),
-          width: 360,
-          ...sx,
-        },
+          ...(Array.isArray(sx) ? sx : [sx]),
+        ],
       }}
     >
-      {renderHead}
+      {renderHead()}
 
       <Scrollbar>
-        <Stack spacing={6} sx={{ px: 2.5, pb: 5 }}>
-          <Stack spacing={2}>
-            {!hideColorScheme && renderMode}
-            {!hideDirection && renderRTL}
-          </Stack>
+        <Box
+          sx={{
+            pb: 5,
+            gap: 6,
+            px: 2.5,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Box
+            sx={{
+              gap: 2,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+            }}
+          >
+            {isColorSchemeVisible && renderMode()}
+            {isContrastVisible && renderContrast()}
+            {isDirectionVisible && renderRtl()}
+            {isCompactLayoutVisible && renderCompact()}
+          </Box>
 
-          {!hidePresets && renderPresets}
-          {!hideFont && renderFont}
-        </Stack>
+          {(isNavColorVisible || isNavLayoutVisible) && renderNav()}
+          {isPrimaryColorVisible && renderPresets()}
+          {(isFontFamilyVisible || isFontSizeVisible) && renderFont()}
+        </Box>
       </Scrollbar>
     </Drawer>
   );

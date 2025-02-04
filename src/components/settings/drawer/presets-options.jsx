@@ -1,81 +1,48 @@
 import Box from '@mui/material/Box';
-import ButtonBase from '@mui/material/ButtonBase';
+import { alpha as hexAlpha } from '@mui/material/styles';
 
-import { varAlpha, stylesMode } from 'src/theme/styles';
+import { CONFIG } from 'src/global-config';
 
-import { Block } from './styles';
+import { OptionButton } from './styles';
+import { SvgColor } from '../../svg-color';
 
 // ----------------------------------------------------------------------
 
-export function PresetsOptions({ value, options, onClickOption }) {
+export function PresetsOptions({ sx, value, options, onChangeOption, ...other }) {
   return (
-    <Block title="Presets">
-      <Box component="ul" gap={1} display="grid" gridTemplateColumns="repeat(3, 1fr)">
-        {options.map((option) => {
-          const selected = value === option.name;
+    <Box
+      sx={[
+        () => ({
+          gap: 1.5,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+        }),
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
+      {...other}
+    >
+      {options.map((option) => {
+        const selected = value === option.name;
 
-          const primaryColor = option.value[0];
-          const secondaryColor = option.value[1];
-
-          return (
-            <Box component="li" key={option.name} sx={{ display: 'flex' }}>
-              <ButtonBase
-                disableRipple
-                onClick={() => onClickOption(option.name)}
-                sx={(theme) => ({
-                  py: 2.5,
-                  width: 1,
-                  borderWidth: 1,
-                  borderRadius: 1.75,
-                  borderStyle: 'solid',
-                  border: `solid 1px transparent`,
-                  ...(selected && {
-                    bgcolor: 'background.paper',
-                    borderColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
-                    boxShadow: `-8px 8px 20px -4px ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)}`,
-                    [stylesMode.dark]: {
-                      boxShadow: `-8px 8px 20px -4px ${varAlpha(theme.vars.palette.common.blackChannel, 0.12)}`,
-                    },
-                  }),
-                })}
-              >
-                <Box
-                  sx={{
-                    width: 44,
-                    height: 44,
-                    overflow: 'hidden',
-                    borderRadius: '50%',
-                    position: 'relative',
-                    bgcolor: primaryColor,
-                  }}
-                >
-                  <Box
-                    sx={(theme) => ({
-                      top: 0,
-                      right: 0,
-                      bottom: 0,
-                      m: 'auto',
-                      width: 0.5,
-                      height: '120%',
-                      position: 'absolute',
-                      borderRadius: 'inherit',
-                      bgcolor: secondaryColor,
-                      transition: theme.transitions.create('transform', {
-                        duration: theme.transitions.duration.complex,
-                        easing: theme.transitions.easing.sharp,
-                      }),
-                      ...(selected && {
-                        transformOrigin: 'left',
-                        transform: 'rotate(45deg)',
-                      }),
-                    })}
-                  />
-                </Box>
-              </ButtonBase>
-            </Box>
-          );
-        })}
-      </Box>
-    </Block>
+        return (
+          <OptionButton
+            key={option.name}
+            onClick={() => onChangeOption(option.name)}
+            sx={{
+              height: 64,
+              color: option.value,
+              ...(selected && {
+                bgcolor: hexAlpha(option.value, 0.08),
+              }),
+            }}
+          >
+            <SvgColor
+              src={`${CONFIG.assetsDir}/assets/icons/settings/ic-siderbar-duotone.svg`}
+              sx={{ width: 28, height: 28, color: 'currentColor' }}
+            />
+          </OptionButton>
+        );
+      })}
+    </Box>
   );
 }

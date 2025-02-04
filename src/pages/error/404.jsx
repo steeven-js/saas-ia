@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 
-import { CONFIG } from 'src/config-global';
+import { CONFIG } from 'src/global-config';
 
-import { NotFoundView } from 'src/sections/error/not-found-view';
+import { NotFoundView } from 'src/sections/error';
 
 // ----------------------------------------------------------------------
 

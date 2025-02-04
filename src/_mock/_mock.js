@@ -1,33 +1,36 @@
 import { fSub } from 'src/utils/format-time';
 
-import { CONFIG } from 'src/config-global';
+import { CONFIG } from 'src/global-config';
 
 import {
   _id,
   _ages,
   _roles,
-  _emails,
   _prices,
-  _nativeL,
-  _nativeM,
-  _nativeS,
+  _emails,
   _ratings,
-  _booleans,
+  _nativeS,
+  _nativeM,
+  _nativeL,
   _percents,
-  _taskNames,
-  _jobTitles,
-  _tourNames,
-  _fullNames,
-  _lastNames,
+  _booleans,
   _sentences,
-  _firstNames,
+  _lastNames,
+  _fullNames,
+  _tourNames,
+  _jobTitles,
+  _taskNames,
+  _fileNames,
   _postTitles,
+  _firstNames,
+  _eventNames,
   _courseNames,
   _fullAddress,
-  _phoneNumbers,
-  _descriptions,
-  _productNames,
   _companyNames,
+  _productNames,
+  _descriptions,
+  _phoneNumbers,
+  _countryNames,
 } from './assets';
 
 // ----------------------------------------------------------------------
@@ -39,6 +42,8 @@ export const _mock = {
   role: (index) => _roles[index],
   // Text
   courseNames: (index) => _courseNames[index],
+  fileNames: (index) => _fileNames[index],
+  eventNames: (index) => _eventNames[index],
   taskNames: (index) => _taskNames[index],
   postTitle: (index) => _postTitles[index],
   jobTitle: (index) => _jobTitles[index],
@@ -54,7 +59,8 @@ export const _mock = {
   firstName: (index) => _firstNames[index],
   lastName: (index) => _lastNames[index],
   fullName: (index) => _fullNames[index],
-  companyName: (index) => _companyNames[index],
+  companyNames: (index) => _companyNames[index],
+  countryNames: (index) => _countryNames[index],
   // Number
   number: {
     percent: (index) => _percents[index],
@@ -65,21 +71,16 @@ export const _mock = {
     nativeM: (index) => _nativeM[index],
     nativeL: (index) => _nativeL[index],
   },
-  // Media
+  // Image
   image: {
-    cover: (index) => `${CONFIG.assetsDir}/assets/images/cover/cover-${index + 1}.webp`,
-    course: (index) => `${CONFIG.assetsDir}/assets/images/course/course-${index + 1}.webp`,
-    avatar: (index) => `${CONFIG.assetsDir}/assets/images/avatar/avatar-${index + 1}.webp`,
-    travel: (index) => `${CONFIG.assetsDir}/assets/images/travel/travel-${index + 1}.webp`,
-    career: (index) => `${CONFIG.assetsDir}/assets/images/career/career-${index + 1}.webp`,
-    company: (index) => `${CONFIG.assetsDir}/assets/images/company/company-${index + 1}.webp`,
-    product: (index) => `${CONFIG.assetsDir}/assets/images/z-product/product-${index + 1}.webp`,
-    portrait: (index) => `${CONFIG.assetsDir}/assets/images/portrait/portrait-${index + 1}.webp`,
-    marketing: (index) => `${CONFIG.assetsDir}/assets/images/marketing/marketing-${index + 1}.webp`,
+    cover: (index) => `${CONFIG.assetsDir}/assets/images/mock/cover/cover-${index + 1}.webp`,
+    avatar: (index) => `${CONFIG.assetsDir}/assets/images/mock/avatar/avatar-${index + 1}.webp`,
+    travel: (index) => `${CONFIG.assetsDir}/assets/images/mock/travel/travel-${index + 1}.webp`,
+    course: (index) => `${CONFIG.assetsDir}/assets/images/mock/course/course-${index + 1}.webp`,
+    company: (index) => `${CONFIG.assetsDir}/assets/images/mock/company/company-${index + 1}.webp`,
+    product: (index) =>
+      `${CONFIG.assetsDir}/assets/images/mock/m-product/product-${index + 1}.webp`,
+    portrait: (index) =>
+      `${CONFIG.assetsDir}/assets/images/mock/portrait/portrait-${index + 1}.webp`,
   },
-  video: (index) =>
-    [
-      `${CONFIG.assetsDir}/assets/video/video-1.mp4`,
-      `${CONFIG.assetsDir}/assets/video/video-2.mp4`,
-    ][index],
 };

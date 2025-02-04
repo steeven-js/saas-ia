@@ -7,18 +7,21 @@ import { varContainer } from './variants';
 
 // ----------------------------------------------------------------------
 
-export const MotionContainer = forwardRef(
-  ({ animate, action = false, children, ...other }, ref) => {
-    const commonProps = {
-      ref,
-      component: m.div,
-      variants: varContainer(),
-      initial: action ? false : 'initial',
-      animate: action ? (animate ? 'animate' : 'exit') : 'animate',
-      exit: action ? undefined : 'exit',
-      ...other,
-    };
+export const MotionContainer = forwardRef((props, ref) => {
+  const { animate, action = false, sx, children, ...other } = props;
 
-    return <Box {...commonProps}>{children}</Box>;
-  }
-);
+  return (
+    <Box
+      ref={ref}
+      component={m.div}
+      variants={varContainer()}
+      initial={action ? false : 'initial'}
+      animate={action ? (animate ? 'animate' : 'exit') : 'animate'}
+      exit={action ? undefined : 'exit'}
+      sx={sx}
+      {...other}
+    >
+      {children}
+    </Box>
+  );
+});

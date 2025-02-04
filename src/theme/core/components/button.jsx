@@ -1,7 +1,9 @@
+import { varAlpha } from 'minimal-shared/utils';
+
 import { buttonClasses } from '@mui/material/Button';
 import { loadingButtonClasses } from '@mui/lab/LoadingButton';
 
-import { varAlpha, stylesMode } from '../../styles';
+// ----------------------------------------------------------------------
 
 const COLORS = ['primary', 'secondary', 'info', 'success', 'warning', 'error'];
 
@@ -22,7 +24,9 @@ const MuiButtonBase = {
   /** **************************************
    * STYLE
    *************************************** */
-  styleOverrides: { root: ({ theme }) => ({ fontFamily: theme.typography.fontFamily }) },
+  styleOverrides: {
+    root: ({ theme }) => ({ fontFamily: theme.typography.fontFamily }),
+  },
 };
 
 // ----------------------------------------------------------------------
@@ -34,8 +38,12 @@ const softVariant = {
     style: ({ theme }) => ({
       color: theme.vars.palette[color].dark,
       backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.16),
-      '&:hover': { backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.32) },
-      [stylesMode.dark]: { color: theme.vars.palette[color].light },
+      '&:hover': {
+        backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.32),
+      },
+      ...theme.applyStyles('dark', {
+        color: theme.vars.palette[color].light,
+      }),
     }),
   })),
   base: [
@@ -43,7 +51,9 @@ const softVariant = {
       props: ({ ownerState }) => ownerState.variant === 'soft',
       style: ({ theme }) => ({
         backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
-        '&:hover': { backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.24) },
+        '&:hover': {
+          backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.24),
+        },
         [`&.${buttonClasses.disabled}`]: {
           backgroundColor: theme.vars.palette.action.disabledBackground,
         },
@@ -65,26 +75,17 @@ const MuiButton = {
   defaultProps: { color: 'inherit', disableElevation: true },
 
   /** **************************************
-   * VARIANTS
-   *************************************** */
-  variants: [
-    /**
-     * @variant soft
-     */
-    ...[...softVariant.base, ...softVariant.colors],
-  ],
-
-  /** **************************************
    * STYLE
    *************************************** */
   styleOverrides: {
+    root: { variants: [softVariant.base, softVariant.colors].flat() },
     /**
      * @variant contained
      */
     contained: ({ theme, ownerState }) => {
       const styled = {
         colors: styleColors(ownerState, (color) => ({
-          '&:hover': { boxShadow: theme.customShadows[color] },
+          '&:hover': { boxShadow: theme.vars.customShadows[color] },
         })),
         inheritColor: {
           ...(ownerState.color === 'inherit' &&
@@ -92,14 +93,14 @@ const MuiButton = {
               color: theme.vars.palette.common.white,
               backgroundColor: theme.vars.palette.grey[800],
               '&:hover': {
-                boxShadow: theme.customShadows.z8,
+                boxShadow: theme.vars.customShadows.z8,
                 backgroundColor: theme.vars.palette.grey[700],
               },
-              [stylesMode.dark]: {
+              ...theme.applyStyles('dark', {
                 color: theme.vars.palette.grey[800],
                 backgroundColor: theme.vars.palette.common.white,
                 '&:hover': { backgroundColor: theme.vars.palette.grey[400] },
-              },
+              }),
             }),
         },
       };
@@ -121,7 +122,10 @@ const MuiButton = {
             }),
         },
         base: {
-          '&:hover': { borderColor: 'currentColor', boxShadow: '0 0 0 0.75px currentColor' },
+          '&:hover': {
+            borderColor: 'currentColor',
+            boxShadow: '0 0 0 0.75px currentColor',
+          },
         },
       };
       return { ...styled.base, ...styled.inheritColor, ...styled.colors };
@@ -141,7 +145,7 @@ const MuiButton = {
       return { ...styled.inheritColor };
     },
     /**
-     * @size
+     * @sizes
      */
     sizeSmall: ({ ownerState }) => ({
       height: 30,

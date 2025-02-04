@@ -1,67 +1,62 @@
-import COLORS from './colors.json';
-import { varAlpha, createPaletteChannel } from '../styles';
+import { varAlpha, createPaletteChannel } from 'minimal-shared/utils';
+
+import { themeConfig } from '../theme-config';
 
 // ----------------------------------------------------------------------
 
-// Grey
-// ----------------------------------------------------------------------
+// Primary color
+export const primary = createPaletteChannel(themeConfig.palette.primary);
 
-export const grey = createPaletteChannel(COLORS.grey);
+// Secondary color
+export const secondary = createPaletteChannel(themeConfig.palette.secondary);
 
-// Primary
-// ----------------------------------------------------------------------
+// Info color
+export const info = createPaletteChannel(themeConfig.palette.info);
 
-export const primary = createPaletteChannel(COLORS.primary);
+// Success color
+export const success = createPaletteChannel(themeConfig.palette.success);
 
-// Secondary
-// ----------------------------------------------------------------------
+// Warning color
+export const warning = createPaletteChannel(themeConfig.palette.warning);
 
-export const secondary = createPaletteChannel(COLORS.secondary);
+// Error color
+export const error = createPaletteChannel(themeConfig.palette.error);
 
-// Info
-// ----------------------------------------------------------------------
+// Common color
+export const common = createPaletteChannel(themeConfig.palette.common);
 
-export const info = createPaletteChannel(COLORS.info);
+// Grey color
+export const grey = createPaletteChannel(themeConfig.palette.grey);
 
-// Success
-// ----------------------------------------------------------------------
-
-export const success = createPaletteChannel(COLORS.success);
-
-// Warning
-// ----------------------------------------------------------------------
-
-export const warning = createPaletteChannel(COLORS.warning);
-
-// Error
-// ----------------------------------------------------------------------
-
-export const error = createPaletteChannel(COLORS.error);
-
-// Common
-// ----------------------------------------------------------------------
-
-export const common = createPaletteChannel(COLORS.common);
-
-// Text
-// ----------------------------------------------------------------------
-
+// Text color
 export const text = {
-  light: createPaletteChannel({ primary: grey[800], secondary: grey[600], disabled: grey[500] }),
-  dark: createPaletteChannel({ primary: '#FFFFFF', secondary: grey[500], disabled: grey[600] }),
+  light: createPaletteChannel({
+    primary: grey[800],
+    secondary: grey[600],
+    disabled: grey[500],
+  }),
+  dark: createPaletteChannel({
+    primary: '#FFFFFF',
+    secondary: grey[500],
+    disabled: grey[600],
+  }),
 };
 
-// Background
-// ----------------------------------------------------------------------
-
+// Background color
 export const background = {
-  light: createPaletteChannel({ paper: '#FFFFFF', default: '#FFFFFF', neutral: grey[200] }),
-  dark: createPaletteChannel({ paper: grey[800], default: grey[900], neutral: '#28323D' }),
+  light: createPaletteChannel({
+    paper: '#FFFFFF',
+    default: '#FFFFFF',
+    neutral: grey[200],
+  }),
+  dark: createPaletteChannel({
+    paper: grey[800],
+    default: grey[900],
+    neutral: '#28323D',
+  }),
 };
 
-// Action
-// ----------------------------------------------------------------------
-
+// Base action color
 export const baseAction = {
   hover: varAlpha(grey['500Channel'], 0.08),
   selected: varAlpha(grey['500Channel'], 0.16),
@@ -72,18 +67,15 @@ export const baseAction = {
   disabledOpacity: 0.48,
 };
 
-// ----------------------------------------------------------------------
-
+// Action color
 export const action = {
   light: { ...baseAction, active: grey[600] },
   dark: { ...baseAction, active: grey[500] },
 };
 
-/*
- * Base palette
- */
 // ----------------------------------------------------------------------
 
+// Base palette
 export const basePalette = {
   primary,
   secondary,
@@ -91,33 +83,22 @@ export const basePalette = {
   success,
   warning,
   error,
-  grey,
   common,
+  grey,
   divider: varAlpha(grey['500Channel'], 0.2),
-  action,
 };
 
-// ----------------------------------------------------------------------
-
-export const lightPalette = {
-  ...basePalette,
-  text: text.light,
-  background: background.light,
-  action: action.light,
-};
-
-// ----------------------------------------------------------------------
-
-export const darkPalette = {
-  ...basePalette,
-  text: text.dark,
-  background: background.dark,
-  action: action.dark,
-};
-
-// ----------------------------------------------------------------------
-
-export const colorSchemes = {
-  light: { palette: lightPalette },
-  dark: { palette: darkPalette },
+export const palette = {
+  light: {
+    ...basePalette,
+    text: text.light,
+    background: background.light,
+    action: action.light,
+  },
+  dark: {
+    ...basePalette,
+    text: text.dark,
+    background: background.dark,
+    action: action.dark,
+  },
 };

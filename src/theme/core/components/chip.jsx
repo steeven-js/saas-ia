@@ -1,7 +1,7 @@
+import { varAlpha } from 'minimal-shared/utils';
+
 import SvgIcon from '@mui/material/SvgIcon';
 import { chipClasses } from '@mui/material/Chip';
-
-import { varAlpha, stylesMode } from '../../styles';
 
 // ----------------------------------------------------------------------
 
@@ -9,9 +9,7 @@ import { varAlpha, stylesMode } from '../../styles';
  * Icons
  * https://icon-sets.iconify.design/solar/close-circle-bold
  */
-// ----------------------------------------------------------------------
-
-export const ChipDeleteIcon = (props) => (
+const ChipDeleteIcon = (props) => (
   <SvgIcon {...props}>
     <path
       fill="currentColor"
@@ -22,9 +20,9 @@ export const ChipDeleteIcon = (props) => (
   </SvgIcon>
 );
 
-const COLORS = ['primary', 'secondary', 'info', 'success', 'warning', 'error'];
-
 // ----------------------------------------------------------------------
+
+const COLORS = ['primary', 'secondary', 'info', 'success', 'warning', 'error'];
 
 function styleColors(ownerState, styles) {
   const outputStyle = COLORS.reduce((acc, color) => {
@@ -44,8 +42,12 @@ const softVariant = {
     style: ({ theme }) => ({
       color: theme.vars.palette[color].dark,
       backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.16),
-      '&:hover': { backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.32) },
-      [stylesMode.dark]: { color: theme.vars.palette[color].light },
+      '&:hover': {
+        backgroundColor: varAlpha(theme.vars.palette[color].mainChannel, 0.32),
+      },
+      ...theme.applyStyles('dark', {
+        color: theme.vars.palette[color].light,
+      }),
     }),
   })),
   inheritColor: [
@@ -53,7 +55,9 @@ const softVariant = {
       props: ({ ownerState }) => ownerState.variant === 'soft' && ownerState.color === 'default',
       style: ({ theme }) => ({
         backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.16),
-        '&:hover': { backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.32) },
+        '&:hover': {
+          backgroundColor: varAlpha(theme.vars.palette.grey['500Channel'], 0.32),
+        },
       }),
     },
   ],
@@ -66,16 +70,6 @@ const MuiChip = {
    * DEFAULT PROPS
    *************************************** */
   defaultProps: { deleteIcon: <ChipDeleteIcon /> },
-
-  /** **************************************
-   * VARIANTS
-   *************************************** */
-  variants: [
-    /**
-     * @variant soft
-     */
-    ...[...softVariant.inheritColor, ...softVariant.colors],
-  ],
 
   /** **************************************
    * STYLE
@@ -108,7 +102,17 @@ const MuiChip = {
         },
       };
 
-      return { ...styled.colors, ...styled.disabled };
+      return {
+        variants: [
+          /**
+           * @variant soft
+           */
+          softVariant.inheritColor,
+          softVariant.colors,
+        ].flat(),
+        ...styled.colors,
+        ...styled.disabled,
+      };
     },
     label: ({ theme }) => ({ fontWeight: theme.typography.fontWeightMedium }),
     icon: { color: 'currentColor' },
@@ -117,7 +121,12 @@ const MuiChip = {
       color: 'currentColor',
       '&:hover': { opacity: 1, color: 'currentColor' },
     },
-    sizeMedium: ({ theme }) => ({ borderRadius: theme.shape.borderRadius * 1.25 }),
+    /**
+     * @sizes
+     */
+    sizeMedium: ({ theme }) => ({
+      borderRadius: theme.shape.borderRadius * 1.25,
+    }),
     sizeSmall: ({ theme }) => ({ borderRadius: theme.shape.borderRadius }),
     /**
      * @variant filled
@@ -129,12 +138,14 @@ const MuiChip = {
             ownerState.color === 'default' && {
               color: theme.vars.palette.common.white,
               backgroundColor: theme.vars.palette.text.primary,
-              [`& .${chipClasses.avatar}`]: { color: theme.vars.palette.text.primary },
+              [`& .${chipClasses.avatar}`]: {
+                color: theme.vars.palette.text.primary,
+              },
               '&:hover': { backgroundColor: theme.vars.palette.grey[700] },
-              [stylesMode.dark]: {
+              ...theme.applyStyles('dark', {
                 color: theme.vars.palette.grey[800],
                 '&:hover': { backgroundColor: theme.vars.palette.grey[100] },
-              },
+              }),
             }),
         },
       };

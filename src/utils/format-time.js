@@ -4,15 +4,34 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 // ----------------------------------------------------------------------
 
+/**
+ * @Docs
+ * https://day.js.org/docs/en/display/format
+ */
+
+/**
+ * Default timezones
+ * https://day.js.org/docs/en/timezone/set-default-timezone#docsNav
+ *
+ */
+
+/**
+ * UTC
+ * https://day.js.org/docs/en/plugin/utc
+ * @install
+ * import utc from 'dayjs/plugin/utc';
+ * dayjs.extend(utc);
+ * @usage
+ * dayjs().utc().format()
+ *
+ */
+
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
-/**
- * Docs: https://day.js.org/docs/en/display/format
- */
 // ----------------------------------------------------------------------
 
-export const formatStr = {
+export const formatPatterns = {
   dateTime: 'DD MMM YYYY h:mm a', // 17 Apr 2022 12:00 am
   date: 'DD MMM YYYY', // 17 Apr 2022
   time: 'h:mm a', // 12:00 am
@@ -26,106 +45,104 @@ export const formatStr = {
   },
 };
 
+const isValidDate = (date) => date !== null && date !== undefined && dayjs(date).isValid();
+
 // ----------------------------------------------------------------------
 
-export function today(format) {
-  return dayjs(new Date()).startOf('day').format(format);
+export function today(template) {
+  return dayjs(new Date()).startOf('day').format(template);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: 17 Apr 2022 12:00 am
+/**
+ * @output 17 Apr 2022 12:00 am
  */
 
 // ----------------------------------------------------------------------
 
-export function fDateTime(date, format) {
-  if (!date) {
-    return null;
+export function fDateTime(date, template) {
+  if (!isValidDate(date)) {
+    return 'Invalid date';
   }
 
-  const isValid = dayjs(date).isValid();
-
-  return isValid ? dayjs(date).format(format ?? formatStr.dateTime) : 'Invalid time value';
+  return dayjs(date).format(template ?? formatPatterns.dateTime);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: 17 Apr 2022
+/**
+ * @output 17 Apr 2022
  */
 
 // ----------------------------------------------------------------------
 
-export function fDate(date, format) {
-  if (!date) {
-    return null;
+export function fDate(date, template) {
+  if (!isValidDate(date)) {
+    return 'Invalid date';
   }
 
-  const isValid = dayjs(date).isValid();
-
-  return isValid ? dayjs(date).format(format ?? formatStr.date) : 'Invalid time value';
+  return dayjs(date).format(template ?? formatPatterns.date);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: 12:00 am
+/**
+ * @output 12:00 am
  */
 
 // ----------------------------------------------------------------------
 
-export function fTime(date, format) {
-  if (!date) {
-    return null;
+export function fTime(date, template) {
+  if (!isValidDate(date)) {
+    return 'Invalid date';
   }
 
-  const isValid = dayjs(date).isValid();
-
-  return isValid ? dayjs(date).format(format ?? formatStr.time) : 'Invalid time value';
+  return dayjs(date).format(template ?? formatPatterns.time);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: 1713250100
+/**
+ * @output 1713250100
  */
 
 // ----------------------------------------------------------------------
 
 export function fTimestamp(date) {
-  if (!date) {
-    return null;
+  if (!isValidDate(date)) {
+    return 'Invalid date';
   }
 
-  const isValid = dayjs(date).isValid();
-
-  return isValid ? dayjs(date).valueOf() : 'Invalid time value';
+  return dayjs(date).valueOf();
 }
 
 // ----------------------------------------------------------------------
 
-/** output: a few seconds, 2 years
+/**
+ * @output a few seconds, 2 years
  */
 
 // ----------------------------------------------------------------------
 
 export function fToNow(date) {
-  if (!date) {
-    return null;
+  if (!isValidDate(date)) {
+    return 'Invalid date';
   }
 
-  const isValid = dayjs(date).isValid();
-
-  return isValid ? dayjs(date).toNow(true) : 'Invalid time value';
+  return dayjs(date).toNow(true);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: boolean
+/**
+ * @output boolean
  */
 
 // ----------------------------------------------------------------------
 
 export function fIsBetween(inputDate, startDate, endDate) {
-  if (!inputDate || !startDate || !endDate) {
+  if (!isValidDate(inputDate) || !isValidDate(startDate) || !isValidDate(endDate)) {
     return false;
   }
 
@@ -133,48 +150,51 @@ export function fIsBetween(inputDate, startDate, endDate) {
   const formattedStartDate = fTimestamp(startDate);
   const formattedEndDate = fTimestamp(endDate);
 
-  if (formattedInputDate && formattedStartDate && formattedEndDate) {
-    return formattedInputDate >= formattedStartDate && formattedInputDate <= formattedEndDate;
+  if (
+    formattedInputDate === 'Invalid date' ||
+    formattedStartDate === 'Invalid date' ||
+    formattedEndDate === 'Invalid date'
+  ) {
+    return false;
   }
 
-  return false;
+  return formattedInputDate >= formattedStartDate && formattedInputDate <= formattedEndDate;
 }
 
 // ----------------------------------------------------------------------
 
-/** output: boolean
+/**
+ * @output boolean
  */
 
 // ----------------------------------------------------------------------
 
 export function fIsAfter(startDate, endDate) {
+  if (!isValidDate(startDate) || !isValidDate(endDate)) {
+    return false;
+  }
+
   return dayjs(startDate).isAfter(endDate);
 }
 
 // ----------------------------------------------------------------------
 
-/** output: boolean
+/**
+ * @output boolean
  */
 
 // ----------------------------------------------------------------------
 
-export function fIsSame(startDate, endDate, units) {
-  if (!startDate || !endDate) {
+export function fIsSame(startDate, endDate, unitToCompare) {
+  if (!isValidDate(startDate) || !isValidDate(endDate)) {
     return false;
   }
 
-  const isValid = dayjs(startDate).isValid() && dayjs(endDate).isValid();
-
-  if (!isValid) {
-    return 'Invalid time value';
-  }
-
-  return dayjs(startDate).isSame(endDate, units ?? 'year');
+  return dayjs(startDate).isSame(endDate, unitToCompare ?? 'year');
 }
 
-// ----------------------------------------------------------------------
-
-/** output:
+/**
+ * @output
  * Same day: 26 Apr 2024
  * Same month: 25 - 26 Apr 2024
  * Same month: 25 - 26 Apr 2024
@@ -184,12 +204,8 @@ export function fIsSame(startDate, endDate, units) {
 // ----------------------------------------------------------------------
 
 export function fDateRangeShortLabel(startDate, endDate, initial) {
-  const isValid = dayjs(startDate).isValid() && dayjs(endDate).isValid();
-
-  const isAfter = fIsAfter(startDate, endDate);
-
-  if (!isValid || isAfter) {
-    return 'Invalid time value';
+  if (!isValidDate(startDate) || !isValidDate(endDate) || fIsAfter(startDate, endDate)) {
+    return 'Invalid date';
   }
 
   let label = `${fDate(startDate)} - ${fDate(endDate)}`;
@@ -212,9 +228,6 @@ export function fDateRangeShortLabel(startDate, endDate, initial) {
 
   return label;
 }
-
-/** output: '2024-05-28T05:55:31+00:00'
- */
 
 // ----------------------------------------------------------------------
 
@@ -244,7 +257,8 @@ export function fAdd({
   return result;
 }
 
-/** output: '2024-05-28T05:55:31+00:00'
+/**
+ * @output 2024-05-28T05:55:31+00:00
  */
 
 // ----------------------------------------------------------------------

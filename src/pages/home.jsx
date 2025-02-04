@@ -1,14 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 
-import { HomeView } from 'src/sections/_home/view/home-view';
+import { HomeView } from 'src/sections/home/view';
 
 // ----------------------------------------------------------------------
 
 const metadata = {
-  title: 'Zone UI: The starting point for your next project',
+  title: 'Minimals UI: The starting point for your next project',
   description:
-    'The ZONE is built on top of MUI, a powerful library that provides flexible, customizable, and easy-to-use components.',
-  keywords: 'react,material,kit,application,dashboard,admin,template',
+    'The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style',
 };
 
 export default function Page() {
@@ -16,6 +15,7 @@ export default function Page() {
     <>
       <Helmet>
         <title> {metadata.title}</title>
+        <meta name="description" content={metadata.description} />
       </Helmet>
 
       <HomeView />

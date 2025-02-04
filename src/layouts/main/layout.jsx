@@ -1,142 +1,133 @@
+import { useBoolean } from 'minimal-shared/hooks';
+
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import { useTheme } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { usePathname } from 'src/routes/hooks';
 
-import { useBoolean } from 'src/hooks/use-boolean';
-
-import { varAlpha } from 'src/theme/styles';
-
 import { Logo } from 'src/components/logo';
-import { AnimateBorder } from 'src/components/animate';
 
-import { Main } from './main';
-import { Footer } from './footer';
-import { langs } from '../config-langs';
 import { NavMobile } from './nav/mobile';
-import { HomeFooter } from './home-footer';
 import { NavDesktop } from './nav/desktop';
-import { navData } from '../config-nav-main';
-import { Searchbar } from '../components/searchbar';
+import { Footer, HomeFooter } from './footer';
+import { MainSection } from '../core/main-section';
 import { MenuButton } from '../components/menu-button';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
+import { navData as mainNavData } from '../nav-config-main';
+import { SignInButton } from '../components/sign-in-button';
 import { SettingsButton } from '../components/settings-button';
-import { LanguagePopover } from '../components/language-popover';
 
 // ----------------------------------------------------------------------
 
-export function MainLayout({ sx, children, header }) {
-  const theme = useTheme();
-
+export function MainLayout({ sx, cssVars, children, slotProps, layoutQuery = 'md' }) {
   const pathname = usePathname();
 
-  const openMobileNav = useBoolean();
+  const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
-  const homePage = pathname === '/';
+  const isHomePage = pathname === '/';
 
-  const layoutQuery = 'md';
+  const navData = slotProps?.nav?.data ?? mainNavData;
+
+  const renderHeader = () => {
+    const headerSlots = {
+      topArea: (
+        <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
+          This is an info Alert.
+        </Alert>
+      ),
+      leftArea: (
+        <>
+          {/** @slot Nav mobile */}
+          <MenuButton
+            onClick={onOpen}
+            sx={(theme) => ({
+              mr: 1,
+              ml: -1,
+              [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
+            })}
+          />
+          <NavMobile data={navData} open={open} onClose={onClose} />
+
+          {/** @slot Logo */}
+          <Logo />
+        </>
+      ),
+      rightArea: (
+        <>
+          {/** @slot Nav desktop */}
+          <NavDesktop
+            data={navData}
+            sx={(theme) => ({
+              display: 'none',
+              [theme.breakpoints.up(layoutQuery)]: { mr: 2.5, display: 'flex' },
+            })}
+          />
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
+            {/** @slot Settings button */}
+            <SettingsButton />
+
+            {/** @slot Sign in button */}
+            <SignInButton />
+
+            {/** @slot Purchase button */}
+            <Button
+              variant="contained"
+              rel="noopener"
+              target="_blank"
+              href={paths.minimalStore}
+              sx={(theme) => ({
+                display: 'none',
+                [theme.breakpoints.up(layoutQuery)]: { display: 'inline-flex' },
+              })}
+            >
+              Purchase
+            </Button>
+          </Box>
+        </>
+      ),
+    };
+
+    return (
+      <HeaderSection
+        layoutQuery={layoutQuery}
+        {...slotProps?.header}
+        slots={{ ...headerSlots, ...slotProps?.header?.slots }}
+        slotProps={slotProps?.header?.slotProps}
+        sx={slotProps?.header?.sx}
+      />
+    );
+  };
+
+  const renderFooter = () =>
+    isHomePage ? (
+      <HomeFooter sx={slotProps?.footer?.sx} />
+    ) : (
+      <Footer sx={slotProps?.footer?.sx} layoutQuery={layoutQuery} />
+    );
+
+  const renderMain = () => <MainSection {...slotProps?.main}>{children}</MainSection>;
 
   return (
     <LayoutSection
       /** **************************************
-       * Header
+       * @Header
        *************************************** */
-      headerSection={
-        <HeaderSection
-          layoutQuery={layoutQuery}
-          sx={header?.sx}
-          slots={{
-            topArea: (
-              <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
-                This is an info Alert.
-              </Alert>
-            ),
-            leftArea: (
-              <>
-                {/* -- Menu button -- */}
-                <MenuButton
-                  onClick={openMobileNav.onTrue}
-                  sx={{
-                    mr: 1,
-                    ml: -1,
-                    [theme.breakpoints.up(layoutQuery)]: { display: 'none' },
-                  }}
-                />
-                <NavMobile
-                  data={navData}
-                  open={openMobileNav.value}
-                  onClose={openMobileNav.onFalse}
-                />
-                {/* -- Logo -- */}
-                <Logo />
-              </>
-            ),
-            centerArea: (
-              <NavDesktop
-                data={navData}
-                sx={{
-                  display: 'none',
-                  [theme.breakpoints.up(layoutQuery)]: { display: 'flex' },
-                }}
-              />
-            ),
-            rightArea: (
-              <Box gap={{ [layoutQuery]: 1 }} display="flex" alignItems="center">
-                {/* -- Searchbar -- */}
-                <Searchbar />
-                {/* -- Language popover -- */}
-                <LanguagePopover data={langs} />
-                {/* -- Settings button -- */}
-                <SettingsButton />
-                {/* -- Purchase button -- */}
-                <Box
-                  sx={{
-                    borderRadius: 1,
-                    position: 'relative',
-                    bgcolor: 'text.primary',
-                    color: 'background.paper',
-                    display: { xs: 'none', [layoutQuery]: 'inline-flex' },
-                  }}
-                >
-                  <AnimateBorder
-                    animate={{
-                      duration: 12,
-                      distance: 40,
-                      color: [theme.vars.palette.primary.main, theme.vars.palette.warning.main],
-                      outline: `135deg, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.04)}, ${varAlpha(theme.vars.palette.primary.mainChannel, 0.04)}`,
-                    }}
-                    sx={{ width: 1, height: 1, minHeight: 'auto', position: 'absolute' }}
-                  />
-
-                  <Button
-                    variant="text"
-                    rel="noopener"
-                    target="_blank"
-                    href={paths.zoneStore}
-                    sx={{ px: 2 }}
-                  >
-                    Purchase
-                  </Button>
-                </Box>
-              </Box>
-            ),
-          }}
-        />
-      }
+      headerSection={renderHeader()}
       /** **************************************
-       * Footer
+       * @Footer
        *************************************** */
-      footerSection={homePage ? <HomeFooter /> : <Footer layoutQuery={layoutQuery} />}
+      footerSection={renderFooter()}
       /** **************************************
-       * Style
+       * @Styles
        *************************************** */
+      cssVars={cssVars}
       sx={sx}
     >
-      <Main>{children}</Main>
+      {renderMain()}
     </LayoutSection>
   );
 }

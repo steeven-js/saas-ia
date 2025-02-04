@@ -1,48 +1,27 @@
+import { varAlpha } from 'minimal-shared/utils';
+import { useCountdownDate } from 'minimal-shared/hooks';
+
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
-
-import { useCountdownDate } from 'src/hooks/use-countdown';
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
 import { _socials } from 'src/_mock';
-import { CONFIG } from 'src/config-global';
-
-import { SvgColor } from 'src/components/svg-color';
+import { ComingSoonIllustration } from 'src/assets/illustrations';
+import { TwitterIcon, FacebookIcon, LinkedinIcon, InstagramIcon } from 'src/assets/icons';
 
 // ----------------------------------------------------------------------
 
 export function ComingSoonView() {
   const countdown = useCountdownDate(new Date('2025-08-20 20:30'));
 
-  const renderSocials = (
-    <Box display="flex" sx={{ mx: 'auto' }}>
-      {_socials.map((social) => (
-        <IconButton key={social.value} color="inherit">
-          {(social.value === 'twitter' && (
-            <SvgColor
-              width={20}
-              src={`${CONFIG.assetsDir}/assets/icons/socials/ic-${social.value}.svg`}
-            />
-          )) || (
-            <Box
-              component="img"
-              loading="lazy"
-              alt={social.label}
-              src={`${CONFIG.assetsDir}/assets/icons/socials/ic-${social.value}.svg`}
-              sx={{ width: 20, height: 20 }}
-            />
-          )}
-        </IconButton>
-      ))}
-    </Box>
-  );
-
   return (
-    <>
+    <Container>
       <Typography variant="h3" sx={{ mb: 2 }}>
         Coming soon!
       </Typography>
@@ -51,24 +30,11 @@ export function ComingSoonView() {
         We are currently working hard on this page!
       </Typography>
 
-      <Box
-        component="img"
-        alt="Coming soon"
-        src={`${CONFIG.assetsDir}/assets/illustrations/illustration-comingsoon.svg`}
-        sx={{
-          my: 3,
-          mx: 'auto',
-          width: 320,
-          maxWidth: 1,
-          height: 'auto',
-        }}
-      />
+      <ComingSoonIllustration sx={{ my: { xs: 5, sm: 10 } }} />
 
       <Stack
-        direction="row"
-        justifyContent="center"
         divider={<Box sx={{ mx: { xs: 1, sm: 2.5 } }}>:</Box>}
-        sx={{ typography: 'h2' }}
+        sx={{ typography: 'h2', justifyContent: 'center', flexDirection: 'row' }}
       >
         <TimeBlock label="days" value={countdown.days} />
         <TimeBlock label="hours" value={countdown.hours} />
@@ -78,29 +44,52 @@ export function ComingSoonView() {
 
       <TextField
         fullWidth
-        hiddenLabel
         placeholder="Enter your email"
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Button variant="contained" size="large" color="inherit" sx={{ mr: -1.25 }}>
-                Notify
-              </Button>
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button variant="contained" size="large">
+                  Notify me
+                </Button>
+              </InputAdornment>
+            ),
+            sx: [
+              (theme) => ({
+                pr: 0.5,
+                [`&.${outlinedInputClasses.focused}`]: {
+                  boxShadow: theme.vars.customShadows.z20,
+                  transition: theme.transitions.create(['box-shadow'], {
+                    duration: theme.transitions.duration.shorter,
+                  }),
+                  [`& .${outlinedInputClasses.notchedOutline}`]: {
+                    border: `solid 1px ${varAlpha(theme.vars.palette.grey['500Channel'], 0.32)}`,
+                  },
+                },
+              }),
+            ],
+          },
         }}
         sx={{ my: 5 }}
       />
-
-      {renderSocials}
-    </>
+      <Box sx={{ gap: 1, display: 'flex', justifyContent: 'center' }}>
+        {_socials.map((social) => (
+          <IconButton key={social.label}>
+            {social.value === 'facebook' && <FacebookIcon />}
+            {social.value === 'instagram' && <InstagramIcon />}
+            {social.value === 'linkedin' && <LinkedinIcon />}
+            {social.value === 'twitter' && <TwitterIcon />}
+          </IconButton>
+        ))}
+      </Box>
+    </Container>
   );
 }
 
 function TimeBlock({ label, value }) {
   return (
     <div>
-      <Box> {value} </Box>
+      <div> {value} </div>
       <Box sx={{ color: 'text.secondary', typography: 'body1' }}>{label}</Box>
     </div>
   );

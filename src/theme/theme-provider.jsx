@@ -1,27 +1,30 @@
 import CssBaseline from '@mui/material/CssBaseline';
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import { ThemeProvider as ThemeVarsProvider } from '@mui/material/styles';
+
+import { useTranslate } from 'src/locales';
 
 import { useSettingsContext } from 'src/components/settings';
 
 import { createTheme } from './create-theme';
-import { schemeConfig } from './scheme-config';
-import { RTL } from './with-settings/right-to-left';
+import { Rtl } from './with-settings/right-to-left';
 
 // ----------------------------------------------------------------------
 
-export function ThemeProvider({ children }) {
+export function ThemeProvider({ themeOverrides, children, ...other }) {
+  const { currentLang } = useTranslate();
+
   const settings = useSettingsContext();
 
-  const theme = createTheme(settings);
+  const theme = createTheme({
+    settingsState: settings.state,
+    localeComponents: currentLang?.systemValue,
+    themeOverrides,
+  });
 
   return (
-    <CssVarsProvider
-      theme={theme}
-      defaultMode={schemeConfig.defaultMode}
-      modeStorageKey={schemeConfig.modeStorageKey}
-    >
+    <ThemeVarsProvider disableTransitionOnChange theme={theme} {...other}>
       <CssBaseline />
-      <RTL direction={settings.direction}>{children}</RTL>
-    </CssVarsProvider>
+      <Rtl direction={settings.state.direction}>{children}</Rtl>
+    </ThemeVarsProvider>
   );
 }

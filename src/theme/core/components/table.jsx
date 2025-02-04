@@ -1,7 +1,7 @@
+import { varAlpha } from 'minimal-shared/utils';
+
 import { tableRowClasses } from '@mui/material/TableRow';
 import { tableCellClasses } from '@mui/material/TableCell';
-
-import { varAlpha } from '../../styles';
 
 // ----------------------------------------------------------------------
 
@@ -89,6 +89,8 @@ const MuiTablePagination = {
     actions: { marginRight: 8 },
     select: ({ theme }) => ({
       paddingLeft: 8,
+      display: 'flex',
+      alignItems: 'center',
       '&:focus': { borderRadius: theme.shape.borderRadius },
     }),
     selectIcon: {

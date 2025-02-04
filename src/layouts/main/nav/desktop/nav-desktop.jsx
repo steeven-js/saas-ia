@@ -1,14 +1,19 @@
-import Stack from '@mui/material/Stack';
-
-import { NavUl } from 'src/components/nav-section';
-
+import { Nav, NavUl } from '../components';
 import { NavList } from './nav-desktop-list';
 
 // ----------------------------------------------------------------------
 
-export function NavDesktop({ data, sx }) {
+export function NavDesktop({ data, sx, ...other }) {
   return (
-    <Stack component="nav" sx={{ height: 1, ...sx }}>
+    <Nav
+      sx={[
+        () => ({
+          /* Put styles */
+        }),
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
+      {...other}
+    >
       <NavUl
         sx={{
           gap: 5,
@@ -21,6 +26,6 @@ export function NavDesktop({ data, sx }) {
           <NavList key={list.title} data={list} />
         ))}
       </NavUl>
-    </Stack>
+    </Nav>
   );
 }
